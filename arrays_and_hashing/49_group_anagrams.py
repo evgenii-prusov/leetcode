@@ -1,5 +1,5 @@
 from typing import List
-
+from collections import defaultdict
 
 class Solution:
 
@@ -7,26 +7,17 @@ class Solution:
         if len(strs) < 2:
             return [strs]
 
-        hashmap = {}
+        hashmap = defaultdict(list)
         for s in strs:
-            # get signature from string
-            signature: str = ''
-            s_hashmap: dict[str] = {}
+            s_count: dict[int] = [0] * 26
             for c in s:
-                if c not in s_hashmap:
-                    s_hashmap[c] = 0
-                s_hashmap[c] += 1
-            signature = ''.join(f"{c}{s_hashmap[c]}" for c in sorted(s_hashmap.keys()))
+                s_count[ord(c) - ord('a')] += 1
+            signature = tuple(s_count)
 
             if signature not in hashmap:
                 hashmap[signature] = []
             hashmap[signature].append(s)
-
-        result = []
-        for signature in hashmap.keys():
-            result.append(hashmap[signature])
-
-        return result
+        return hashmap.values()
 
 
 
