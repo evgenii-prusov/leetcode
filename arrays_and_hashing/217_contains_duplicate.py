@@ -2,12 +2,13 @@ from typing import List
 
 
 def contains_duplicate_217(nums: List[int]) -> bool:
-    for i in range(len(nums) - 1):
-        curr_num = nums[i]
+    nums_dict = {}
 
-        for j in range(i+1, len(nums)):
-            if curr_num == nums[j]:
-                return True
+    for num in nums:
+        if nums_dict.get(num, 0) == 1:
+            return True
+
+        nums_dict[num] = 1
 
     return False
 
