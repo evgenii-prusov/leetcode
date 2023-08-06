@@ -6,34 +6,36 @@ class Solution:
         result: bool = False
 
         # check rows and columns validity
-        row_set: set[int] = set()
-        col_set: set[int] = set()
+        rows: list[set] = [
+            set(), set(), set(),
+            set(), set(), set(),
+            set(), set(), set()
+        ]
+        columns: list[set] = [
+            set(), set(), set(),
+            set(), set(), set(),
+            set(), set(), set()
+        ]
+        squares: list[list[set]] = [
+            [set(), set(), set()],
+            [set(), set(), set()],
+            [set(), set(), set()]
+        ]
 
-        for row_num in range(len(board)):
-            for col_num in range(len(board[row_num])):
-                num = board[row_num][col_num]
-                if num.isdigit() and num in row_set:
+        for i in range(9):
+            for j in range(9):
+                num = board[i][j]
+                if num == '.':
+                    continue
+
+                if (num in rows[i] or
+                    num in columns[j] or
+                    num in squares[i // 3][j // 3]):
                     return False
-                row_set.add(num)
 
-                num = board[col_num][row_num]
-                if num.isdigit() and num in col_set:
-                    return False
-                col_set.add(num)
-            row_set.clear()
-            col_set.clear()
-
-        square_set: set[int] = set()
-        for i in range(3):
-            for j in range(3):
-
-                for row_num in range(i * 3, i*3 + 3):
-                    for col_num in range(j * 3, j * 3 + 3):
-                        num = board[row_num][col_num]
-                        if num.isdigit() and num in square_set:
-                            return False
-                        square_set.add(num)
-                square_set.clear()
+                rows[i].add(num)
+                columns[j].add(num)
+                squares[i // 3][j // 3].add(num)
 
         return True
 
@@ -68,4 +70,20 @@ def test_is_valid_sudoku_invalid_2():
         [".", ".", ".", ".", "8", ".", ".", "7", "9"]
     ]
     expected: bool = False
+    assert Solution().isValidSudoku(board=input) is expected
+
+
+def test_is_valid_sudoku_invalid2():
+    input: list[list[str]] = [
+        [".",".",".",".","5",".",".","1","."],
+        [".","4",".","3",".",".",".",".","."],
+        [".",".",".",".",".","3",".",".","1"],
+        ["8",".",".",".",".",".",".","2","."],
+        [".",".","2",".","7",".",".",".","."],
+        [".","1","5",".",".",".",".",".","."],
+        [".",".",".",".",".","2",".",".","."],
+        [".","2",".","9",".",".",".",".","."],
+        [".",".","4",".",".",".",".",".","."]
+    ]
+    expected = False
     assert Solution().isValidSudoku(board=input) is expected
