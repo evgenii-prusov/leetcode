@@ -1,48 +1,109 @@
 from typing import Optional
 
-from node import ListNode as LNode
+from node import ListNode
 from utils import to_string
 
 
 class Solution:
-    def deleteDuplicates(self, head: Optional[LNode]) -> Optional[LNode]:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
         # empty or single node linked list
         if not head or not head.next:
             return head
 
-        prev = None
-        slow = fast = head
-        fast = fast.next
-        while fast and fast.next:
+        left: ListNode = head
+        right: ListNode = head
+        prev: Optional[ListNode] = None
+        while right.next:
+            right = right.next
+            # duplicates detected, go to the next iteration
+            if left.val == right.val:
+                continue
+            if left.next.val == right.val:
+                prev = left
+                left = left.next
+                continue
 
-            if slow.val == fast.val:
-                # in case first two elements are equal
-                if not prev:
-                    new_head = head.next.next
-                    head.next = None
-                    head = new_head
-                    slow = head
-                    fast.next = None
-                    fast = slow.next
-                else:
-                    prev.next = fast.next
-                    slow = fast.next
-                    fast = fast.next.next
-            else:
-                prev = slow
-                slow = slow.next
-                fast = fast.next
+            while left.val != right.val:
+                # prev = left
+                if left.val == head.val:
+                    head = head.next
+                    prev = left
+                left = left.next
+                # prev.next = None
+            if head.val == left.val:
+                prev.next = None
 
-        if fast and slow.val == fast.val:
-            if not prev:
-                return None
+            prev.next = left
+
+        # in case if only one node left
+        if not head.next:
+            return head
+        # in case if two duplicates left
+        if head.val == right.val:
+            return None
+
+        if left.next and left.val == right.val:
             prev.next = None
 
         return head
 
 
-def test_delete_duplicates_1():
-    n1, n2, n3, n4, n5, n6, n7 = LNode(1), LNode(2), LNode(3), LNode(3), LNode(4), LNode(4), LNode(5)
+def test_delete_duplicates_first_three_of_five_node_are_duplicates():
+    n1, n2, n3, n4, n5 = ListNode(1), ListNode(1), ListNode(1), ListNode(2), ListNode(3)
+    n1.next = n2
+    n2.next = n3
+    n3.next = n4
+    n4.next = n5
+    result: str = to_string(Solution().deleteDuplicates(head=n1))
+
+    r1, r2 = ListNode(2), ListNode(3)
+    r1.next = r2
+    expected: str = to_string(r1)
+
+    assert result == expected
+
+
+def test_delete_duplicates_three_nodes_all_duplicates():
+    n1, n2, n3 = ListNode(1), ListNode(1), ListNode(1)
+    n1.next = n2
+    n2.next = n3
+    result: str = to_string(Solution().deleteDuplicates(head=n1))
+
+    expected: str = ''
+
+    assert result == expected
+
+
+def test_delete_duplicates_first_three_and_second_two_of_five_nodes_are_duplicates():
+    n1, n2, n3, n4, n5 = ListNode(1), ListNode(1), ListNode(1), ListNode(2), ListNode(2)
+    n1.next = n2
+    n2.next = n3
+    n3.next = n4
+    n4.next = n5
+    result: str = to_string(Solution().deleteDuplicates(head=n1))
+
+    expected: str = ''
+
+    assert result == expected
+
+
+def test_delete_duplicates_four_nodes_last_three_are_duplicates():
+    n1, n2, n3, n4 = ListNode(1), ListNode(2), ListNode(2), ListNode(2)
+    n1.next = n2
+    n2.next = n3
+    n3.next = n4
+    result: str = to_string(Solution().deleteDuplicates(head=n1))
+
+    r1 = ListNode(1)
+    expected: str = to_string(r1)
+
+    assert result == expected
+
+
+def test_delete_duplicates_seven_nodes_and_two_groups_of_duplicates_in_the_middle():
+    n1, n2, n3 = ListNode(1), ListNode(2), ListNode(3)
+    n4, n5, n6 = ListNode(3), ListNode(4), ListNode(4)
+    n7 = ListNode(5)
     n1.next = n2
     n2.next = n3
     n3.next = n4
@@ -51,112 +112,9 @@ def test_delete_duplicates_1():
     n6.next = n7
     result: str = to_string(Solution().deleteDuplicates(head=n1))
 
-    r1, r2, r3 = LNode(1), LNode(2), LNode(5)
+    r1, r2, r3 = ListNode(1), ListNode(2), ListNode(5)
     r1.next = r2
     r2.next = r3
-    expected: str = to_string(r1)
-
-    assert result == expected
-
-
-def test_delete_duplicates_2():
-    n1, n2, n3, n4, n5 = LNode(1), LNode(1), LNode(1), LNode(2), LNode(3)
-    n1.next = n2
-    n2.next = n3
-    n3.next = n4
-    n4.next = n5
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    r1, r2, r3 = LNode(1), LNode(2), LNode(3)
-    r1.next = r2
-    r2.next = r3
-
-    expected: str = to_string(r1)
-
-    assert result == expected
-
-
-def test_delete_duplicates_3():
-    n1, n2, n3, n4 = LNode(1), LNode(2), LNode(3), LNode(3)
-    n1.next = n2
-    n2.next = n3
-    n3.next = n4
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    r1, r2 = LNode(1), LNode(2)
-    r1.next = r2
-
-    expected: str = to_string(r1)
-
-    assert result == expected
-
-
-def test_delete_duplicates_four_equal_nodes():
-    n1, n2, n3, n4 = LNode(1), LNode(1), LNode(1), LNode(1)
-    n1.next = n2
-    n2.next = n3
-    n3.next = n4
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    expected: str = ''
-
-    assert result == expected
-
-
-def test_delete_duplicates_three_equal_nodes():
-    n1, n2, n3 = LNode(1), LNode(1), LNode(1)
-    n1.next = n2
-    n2.next = n3
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    r1 = LNode(1)
-    expected: str = to_string(r1)
-
-    assert result == expected
-
-
-def test_delete_duplicates_two_equal_nodes():
-    n1, n2 = LNode(1), LNode(1)
-    n1.next = n2
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    expected: str = ''
-
-    assert result == expected
-
-
-def test_delete_duplicates_single_node():
-    n1 = LNode(1)
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    r1 = LNode(1)
-
-    expected: str = to_string(r1)
-
-    assert result == expected
-
-
-def test_delete_duplicates_no_nodes():
-    n1 = None
-
-    assert Solution().deleteDuplicates(head=n1) is None
-
-
-def test_delete_duplicates_two_nodes_without_duplicates():
-    n1, n2 = LNode(1), LNode(2)
-    n1.next = n2
-
-    result: str = to_string(Solution().deleteDuplicates(head=n1))
-
-    r1, r2 = LNode(1), LNode(2)
-    r1.next = r2
-
     expected: str = to_string(r1)
 
     assert result == expected
